@@ -35,6 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MAX_THROTTLE_VALUE 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,7 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile uint8_t data;
+volatile uint8_t data = MAX_THROTTLE_VALUE;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -93,6 +94,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   HAL_UART_Receive_IT(&huart1, &data, sizeof(data));
+  __HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1, 1000 + data*10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -161,7 +163,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
 		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		HAL_UART_Receive_IT(&huart1, &data, sizeof(data));
-		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1,10*data);
+		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1, 1000+data*10);
 	}
 }
 /* USER CODE END 4 */
