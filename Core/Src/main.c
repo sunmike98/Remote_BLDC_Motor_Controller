@@ -36,6 +36,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define MAX_THROTTLE_VALUE 100
+#define THROTTLE_LEVEL(a)	(1000+(a)*10)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -88,13 +89,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART2_UART_Init();
   MX_USART1_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   HAL_UART_Receive_IT(&huart1, &data, sizeof(data));
-  __HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1, 1000 + data*10);
+  __HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1, THROTTLE_LEVEL(data));
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -145,10 +145,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
-                              |RCC_PERIPHCLK_TIM34;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_TIM34;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
-  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.Tim34ClockSelection = RCC_TIM34CLK_HCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
@@ -163,7 +161,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
 		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		HAL_UART_Receive_IT(&huart1, &data, sizeof(data));
-		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1, 1000+data*10);
+		__HAL_TIM_SET_COMPARE(&htim3,TIM_CHANNEL_1, THROTTLE_LEVEL(data));
 	}
 }
 /* USER CODE END 4 */
